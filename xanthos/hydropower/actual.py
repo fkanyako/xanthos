@@ -76,6 +76,7 @@ class HydropowerActual:
         self.q_states = None
         self.env_flow = None
         self.hydro_gcam_regions_EJ = None
+        self.hydro_per_dam_EJ = None
 
         # run simulation
         self.hydro_sim()
@@ -196,6 +197,7 @@ class HydropowerActual:
         energy_all_countries = energy_all_dams.groupby(self.res_data["COUNTRY"], axis=1).sum()
         energy_all_countries_total = energy_all_countries.multiply(list(self.missing_cap["factor"]))
         self.hydro_gcam_regions_EJ = energy_all_countries_total.groupby(list(self.missing_cap["GCAM_ID"]), axis=1).sum()
+        self.hydro_per_dam_EJ = energy_all_dams
 
     def write_output(self):
         """Write results to CSV."""
@@ -203,7 +205,8 @@ class HydropowerActual:
 #        cols = ['region_{}'.format(i) for i in df.columns]
 #        cols.insert(0, 'year')
 #        df.columns = cols
-        odf = self.hydro_gcam_regions_EJ.T
+        #odf = self.hydro_gcam_regions_EJ.T
+        odf = self.hydro_per_dam_EJ.T
         odf.reset_index(inplace=True)
         odf.rename(columns={'index': 'region'}, inplace=True)
         pd.DataFrame.to_csv(odf, self.filename_hydro, index=False)
